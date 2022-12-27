@@ -2,13 +2,14 @@ import json
 
 
 class Product:
-    def __init__(self, name: str, reference: str, price: str, availability: str, img: str, link: str):
+    def __init__(self, name: str, reference: str, price: str, availability: str, img: str, link: str, website: str):
         self.name = name
         self.reference = reference
         self.price = price
         self.availability = availability
         self.img = img
         self.link = link
+        self.website = website
 
     def __str__(self):
         return "name : " + self.name + " reference : " + self.reference + " price : " + self.price + " availability : " + self.availability + " img : " + self.img + " link : " + self.link

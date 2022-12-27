@@ -1,12 +1,15 @@
 from flask import Flask, request
 from bs4 import BeautifulSoup
 import requests
+from flask_cors import CORS, cross_origin
 
 from models import Product
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-###### ***************fetching HTML****************
+###### ***************       fetching HTML          ****************
 
 def search_tunisianet(key):
     html_text = requests.get(
@@ -25,7 +28,8 @@ def search_oxtek(key):
         "https://www.technopro-online.com/module/iqitsearch/searchiqit?s=" + key).text
     return html_text
 
-###### ********************processing data************************
+
+###### ********************   processing data   ************************
 
 
 def get_product_from_tunisianet(soup):
@@ -49,7 +53,7 @@ def get_product_from_tunisianet(soup):
         ## get product availability
         product_availability = soup.find('div', {"id": "stock_availability"}).text.strip()
 
-        product = Product(product_name, products_ref, products_price, product_availability, product_img, product_link)
+        product = Product(product_name, products_ref, products_price, product_availability, product_img, product_link,"Tunisianet")
         return product.toJSON()
 
 
@@ -73,8 +77,9 @@ def get_product_from_wiki(soup):
         product_img_div = soup.find('div', class_="product-image-container image")
         product_img = product_img_div.find('img', class_="replace-2x img-responsive")['src']
 
-        product = Product(product_name, product_reference.replace(' ', ''), products_price, product_availability, product_img,
-                          product_link)
+        product = Product(product_name, product_reference.replace(' ', ''), products_price, product_availability,
+                          product_img,
+                          product_link,"Wiki")
         return product.toJSON()
 
 
@@ -101,11 +106,11 @@ def get_product_from_oxtek(soup):
         product_availability = soup.find('div', class_="product-availability").text.strip()
 
         product = Product(product_name, product_reference, products_price, product_availability, product_img,
-                          product_link)
+                          product_link,"Oxtek")
         return product.toJSON()
 
 
-###### ***************************api******************************
+###### ***************************        api           ******************************
 
 @app.get("/search")
 def get_products():
@@ -135,6 +140,7 @@ def get_products():
 
 
 @app.route('/')
+@cross_origin()
 def hello_world():  # put application's code here
     return 'Hello World!'
 
